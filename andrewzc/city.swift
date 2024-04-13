@@ -23,7 +23,9 @@ class City: Place {
             someCountry.cities.append(self)
             someCountry.score += 1
         } else {
-            print("\(row.name)")
+            if !["🪨", "🌖", "<"].contains(row.icon) && icon != "" {
+                print("Not a country: \(countryIcon) \(row.name)")
+            }
         }
 
         if let icon = row.iconModifier {
@@ -56,7 +58,7 @@ class City: Place {
         case "🏟": self.setFlag("olympics-stadium")
         case "🗼": self.setFlag("olympics-tower")
         case "🏔": self.setFlag("olympics-slopes")
-        case "🏓": self.setFlag("olympics-pingpong")
+        case "🏃‍♂️🤸‍♂️🏊‍♀️🏓": self.setFlag("olympics-pingpong")
         case "*": self.setFlag("sorta")
         default: print("Unknown flag: \(icon)")
         }
@@ -83,6 +85,16 @@ func loadCities(key: String) -> [City] {
                 city.metadata[key + "-prefix"] = prefix
             }
 
+            while (city.name.first?.isEmoji() ?? false) {
+                let otherIcon = String(city.name.first!)
+                city.icons.append(otherIcon)
+                city.name = city.name.substring(from: 1).trim()
+
+                if let otherCountry = Country.getCountry(icon: otherIcon) {
+                    otherCountry.add(place: city, key: key)
+                }
+            }
+            
             return city
         }
     }

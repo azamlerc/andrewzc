@@ -13,6 +13,7 @@ class Row {
     var iconModifier: String?
     var link: String?
     var comment: String?
+    var reference: String?
     var strike = false
     var prefix: String?
     var info: String?
@@ -31,6 +32,11 @@ class Row {
             text = text.substring(after: "-->").trim()
         }
         
+        if text.contains("<!--") && text.hasSuffix("-->") {
+            self.comment = text.substring(start: "<!--", end: "-->")?.trim()
+            text = text.substring(before: "-->").trim()
+        }
+        
         if yearPrefix.contains(key) && text.count > 5 {
             prefix = text.substring(before: " ")
             text = text.substring(after: " ")
@@ -41,16 +47,30 @@ class Row {
             text = text.substring(after: "</span> ")
         }
             
+        if text.contains("<span class=\"dark\">") {
+            reference = text.substring(start: "<span class=\"dark\">", end: "</span>")?.trim()
+            text = text.substring(before: "<span class=\"dark\">").trim() // removes everything after span
+        }
+        
         if key == "mosques" {
             self.icon = text.substring(start: "<span>", end: "</span>") ?? ""
             self.name = text.substring(start: "\">", end: "</a>") ?? ""
             self.link = text.substring(start: "href=\"", end: "\">") ?? ""
         } else if key == "metros" && comment != nil {
-            self.icon = String(comment!.last!)
-            if text.contains(".png\"> ") {
-                text = text.substring(after: ".png\"> ")
+            let last = comment!.last!
+            if last.isEmoji() {
+                self.icon = String(last)
+                if text.contains(".png\"> ") {
+                    text = text.substring(after: ".png\"> ")
+                }
+                self.name = text
+            } else {
+                self.icon = String(text.first!)
+                if text.contains(".png\"> ") {
+                    text = text.substring(after: ".png\"> ")
+                }
+                self.name = text.substring(from: 1).trim()
             }
-            self.name = text
         } else if key == "deaths" && comment != nil {
             let last = comment!.last!
             if last.isEmoji() {
@@ -64,7 +84,7 @@ class Row {
             self.name = text.substring(from: 1).trim()
         } else {
             self.icon = ""
-            self.name = "untitled"
+            self.name = text
         }
         
         if self.name.contains("class=\"strike\"") {
@@ -79,9 +99,8 @@ class Row {
             }
         }
         
-        // somehow it thinks numbers are emoji
-        if name.last!.isEmoji() {
-            iconModifier = String(name.last!)
+        while name.count > 0 && name.last!.isEmoji() {
+            iconModifier = String(name.last!) + (iconModifier ?? "")
             name = String(name.dropLast()).trim()
         }
         

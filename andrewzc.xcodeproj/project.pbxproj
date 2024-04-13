@@ -12,6 +12,8 @@
 		4917A2E22A75DC88008460AF /* extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4917A2E12A75DC88008460AF /* extensions.swift */; };
 		4917A2E42A75E847008460AF /* entity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4917A2E32A75E847008460AF /* entity.swift */; };
 		4917A2E62A75E895008460AF /* place.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4917A2E52A75E895008460AF /* place.swift */; };
+		493DFEF42ADC72F6001AC0DE /* person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 493DFEF32ADC72F6001AC0DE /* person.swift */; };
+		493DFEF62ADC9AEC001AC0DE /* thing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 493DFEF52ADC9AEB001AC0DE /* thing.swift */; };
 		494F12212AA8BF020002DBFF /* row.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494F12202AA8BF020002DBFF /* row.swift */; };
 		4975E7022A75E92A00F8A682 /* country.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4975E7012A75E92A00F8A682 /* country.swift */; };
 		4975E7042A7607CE00F8A682 /* city.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4975E7032A7607CE00F8A682 /* city.swift */; };
@@ -36,6 +38,8 @@
 		4917A2E12A75DC88008460AF /* extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = extensions.swift; sourceTree = "<group>"; };
 		4917A2E32A75E847008460AF /* entity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = entity.swift; sourceTree = "<group>"; };
 		4917A2E52A75E895008460AF /* place.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = place.swift; sourceTree = "<group>"; };
+		493DFEF32ADC72F6001AC0DE /* person.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = person.swift; sourceTree = "<group>"; };
+		493DFEF52ADC9AEB001AC0DE /* thing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = thing.swift; sourceTree = "<group>"; };
 		494F12202AA8BF020002DBFF /* row.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = row.swift; sourceTree = "<group>"; };
 		4975E7012A75E92A00F8A682 /* country.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = country.swift; sourceTree = "<group>"; };
 		4975E7032A7607CE00F8A682 /* city.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = city.swift; sourceTree = "<group>"; };
@@ -76,6 +80,8 @@
 				494F12202AA8BF020002DBFF /* row.swift */,
 				4917A2E32A75E847008460AF /* entity.swift */,
 				4917A2E52A75E895008460AF /* place.swift */,
+				493DFEF52ADC9AEB001AC0DE /* thing.swift */,
+				493DFEF32ADC72F6001AC0DE /* person.swift */,
 				4975E7012A75E92A00F8A682 /* country.swift */,
 				4975E7032A7607CE00F8A682 /* city.swift */,
 				4917A2E12A75DC88008460AF /* extensions.swift */,
@@ -142,12 +148,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				4975E7022A75E92A00F8A682 /* country.swift in Sources */,
+				493DFEF42ADC72F6001AC0DE /* person.swift in Sources */,
 				4917A2E42A75E847008460AF /* entity.swift in Sources */,
 				4975E7042A7607CE00F8A682 /* city.swift in Sources */,
 				4917A2E02A75DAFF008460AF /* htmlfile.swift in Sources */,
 				494F12212AA8BF020002DBFF /* row.swift in Sources */,
 				4917A2D92A75DA64008460AF /* main.swift in Sources */,
 				4917A2E62A75E895008460AF /* place.swift in Sources */,
+				493DFEF62ADC9AEC001AC0DE /* thing.swift in Sources */,
 				4917A2E22A75DC88008460AF /* extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

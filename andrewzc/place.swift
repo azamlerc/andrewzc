@@ -28,7 +28,13 @@ class Place: Entity {
             iconHtml = "<span class=\"todo\">\(iconHtml)</span>"
         }
         let classHtml = strike ? " class=\"strike\"" : ""
-        let nameHtml = link == nil ? name : "<a href=\"\(link!)\"\(classHtml)>\(name)</a>"
+        var nameHtml = link == nil ? name : "<a href=\"\(link!)\"\(classHtml)>\(name)</a>"
+        if reference != nil && reference != name {
+            nameHtml += " <span class=\"dark\">\(reference!)</span>"
+        }
+        if nameHtml.contains("state-large") {
+            nameHtml = nameHtml.replacingOccurrences(of: "state-large\" src=\"images", with: "state-small\" src=\"../images", options: .literal, range: nil)
+        }
         var line = "\(iconHtml) \(nameHtml)\(info ?? "")<br>\n"
         if prefix != nil {
             line = "\(prefix!) \(line)"
@@ -55,7 +61,7 @@ func loadPlaces(key: String) {
                 place.country = country
                 country.add(place: place, key: key)
             } else {
-                if !["🌎", "🌍", "🌊"].contains(row.icon) && icon != "" {
+                if !["🌎", "🌍", "🌊", "🚗", "<"].contains(row.icon) && icon != "" {
                     print("Not a country: \(icon) \(row.name)")
                 }
             }
@@ -69,7 +75,7 @@ func loadPlaces(key: String) {
                     otherCountry.add(place: place, key: key)
                 }
             }
-            
+
             return place
         }
     }

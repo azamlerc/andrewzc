@@ -25,7 +25,7 @@ extension String {
     
     func substring(before: String) -> String {
         if let startRange = self.range(of: before) {
-            return String(self[...startRange.lowerBound])
+            return String(self[..<startRange.lowerBound])
         }
         return self
     }
@@ -57,6 +57,9 @@ extension String {
 
 extension Character {
     func isEmoji() -> Bool {
+        if self == "2️⃣" || self == "7️⃣" {
+            return true
+        }
         if self.isNumber {
             return false
         }

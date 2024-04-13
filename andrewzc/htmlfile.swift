@@ -17,6 +17,7 @@ class HTMLFile {
     var path: String
     
     var contents = ""
+    var lines = [String]()
     var name = ""
     var icon = ""
     
@@ -49,7 +50,7 @@ class HTMLFile {
             }
             pageIndex[key] = self
             
-            var lines: [String] = getBody(html: contents).components(separatedBy: "\n")
+            lines = getBody(html: contents).components(separatedBy: "\n")
                 .map { $0.trim() }
                 .map { $0.remove(trailing: "<br>") }
                 .filter { $0.count > 2 }
@@ -58,7 +59,9 @@ class HTMLFile {
                 lines = lines.filter { $0.hasPrefix("<a class=\"english") || $0.hasPrefix("<hr>") || $0.hasPrefix("<!--") }
             } else {
                 lines = lines.filter { !$0.hasPrefix("<img") && !$0.hasPrefix("<a") && !$0.hasPrefix("<div") && !$0.hasPrefix("</div") && !$0.hasSuffix(":") && !($0.hasPrefix("<!--") && $0.hasSuffix("-->")) }
-                lines.removeFirst()
+                if lines.count > 0 {
+                    lines.removeFirst()
+                }
             }
             let lineGroups = split(array: lines, delimiter: "<hr>")
             rowGroups = lineGroups.map { group in
@@ -77,13 +80,29 @@ class HTMLFile {
         
         do {
             try newContents.write(toFile: path, atomically: true, encoding: .utf8)
+            print(filename)
         } catch {
             print("Error writing string to file: \(error)")
         }
     }
     
-    func link(htmlClass: String, extra: String) -> String {
-        return "\(icon) <a href=\"../\(filename)\" class=\"\(htmlClass)\">\(name)</a>\(extra)<br>\n"
+    func link() -> String {
+        return link([:])
+    }
+    
+    func link(_ params: [String:Any]) -> String {
+        var nameHtml = name
+        let htmlClass:String = params["htmlClass"] as? String ?? ""
+        var extraHtml:String = params["extra"] as? String ?? ""
+        
+        if params["single"] != nil {
+            nameHtml = String(name.dropLast())
+            extraHtml = ""
+        }
+        if params["hideMusic"] != nil && nameHtml.hasPrefix("Music ") {
+            nameHtml = nameHtml.substring(after: "Music ")
+        }
+        return "<a name=\"\(key)\"></a> \(icon) <a href=\"../\(filename)\" class=\"\(htmlClass)\">\(nameHtml)</a>\(extraHtml)<br>\n"
     }
     
     func htmlForRows() -> String {
@@ -142,5 +161,5 @@ func htmlHeader(title: String) -> String {
 }
 
 func htmlFooter() -> String {
-    return " </div>\n</body>\n</html>"
+    return " </div>\n</body>\n<script src=\"../typeahead.js\">\n</script></html>"
 }

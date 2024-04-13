@@ -10,11 +10,13 @@ import Foundation
 class Entity: CustomStringConvertible {
     var icon: String
     var icons: [String]
+    var iconModifier: String?
     var name: String
     var key: String
     var link: String?
     var prefix: String?
     var info: String?
+    var reference: String?
     var strike = false
     var flags = [String:Bool]()
     var metadata = [String:String]() // wasteful to initialize this for every object?
@@ -23,11 +25,13 @@ class Entity: CustomStringConvertible {
     init(row: Row) {
         self.icon = row.icon
         self.icons = [row.icon]
+        self.iconModifier = row.iconModifier
         self.name = row.name
         self.key = simplify(row.name)
         self.link = row.link
         self.prefix = row.prefix
         self.info = row.info
+        self.reference = row.reference
         self.strike = row.strike
     }
     
@@ -70,4 +74,5 @@ func simplify(_ value: String) -> String {
         .replacingOccurrences(of: "’", with: "")
         .replacingOccurrences(of: ".", with: "")
         .folding(options: .diacriticInsensitive, locale: .current)
+        .replacingOccurrences(of: "the-", with: "")
 }

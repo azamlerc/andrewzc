@@ -14,6 +14,7 @@ var countryFiles = [HTMLFile]()
 
 class Country: Place {
     var cities = [City]()
+    var people = [Person]()
     var orderVisited: Int?
     
     var placesByKey = [String:[Place]]()
@@ -116,10 +117,12 @@ class Country: Place {
         
         countryFiles.forEach { flagFile in
             if flag(flagFile.key) {
-                // hardcoding this because it is the only struck out country flag
-                let brexit = flagFile.key == "european-union" && file.key == "united-kingdom"
-                let htmlClass = brexit ? "strike" : ""
-                body.append(flagFile.link(htmlClass: htmlClass, extra: ""))
+                // hardcoding for Brexit because it is the only struck out country flag
+                var flags = [String:Any]()
+                if flagFile.key == "european-union" && file.key == "united-kingdom" {
+                    flags["htmlClass"] = "strike"
+                }
+                body.append(flagFile.link(flags))
             }
         }
         if body.count > 0 {
@@ -129,9 +132,13 @@ class Country: Place {
         let max = 10
         placeFiles.forEach { placeFile in
             if let places = placesByKey[placeFile.key] {
-                let extra = places.count > max ? " (\(places.count))" : ""
+                var flags:[String:Any] = ["htmlClass": "link"]
+                flags["extra"] = places.count > max ? " (\(places.count))" : ""
                 let somePlaces = places.count > max ? Array(places[0..<max]) : places
-                body.append(placeFile.link(htmlClass: "link", extra: extra))
+                if ["highest", "lowest", "capitals", "official-languages"].contains(placeFile.key) && somePlaces.count == 1 {
+                    flags["single"] = true
+                }
+                body.append(placeFile.link(flags))
                 somePlaces.forEach {
                     body.append($0.htmlString())
                 }
@@ -162,7 +169,9 @@ func loadCountries(key: String) -> [Country] {
         }
     }
     if (countryGroups.count > 0) {
-        countryGroups[0].forEach { $0.been = true }
+        if (key != "similar-flags") {
+            countryGroups[0].forEach { $0.been = true }
+        }
     }
     if (key == "countries" && countryGroups.count > 2) {
         for (order, country) in countryGroups[0].enumerated() {
@@ -294,6 +303,7 @@ let countryNames = [
     "🇰🇳": "Saint Kitts and Nevis",
     "🇰🇵": "North Korea",
     "🇰🇷": "South Korea",
+    "🇽🇰": "Kosovo",
     "🇰🇼": "Kuwait",
     "🇰🇾": "Cayman Islands",
     "🇰🇿": "Kazakhstan",
@@ -421,6 +431,7 @@ let countryNames = [
     "🇪🇺": "European Union",
     "🏴󠁧󠁢󠁳󠁣󠁴󠁿": "Scotland",
     "🏴󠁧󠁢󠁷󠁬󠁳󠁿": "Wales",
+    "🇮🇨": "Canary Islands",
     // "🏴󠁧󠁢󠁥󠁮󠁧󠁿": "England",
 ]
 
