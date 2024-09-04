@@ -10,6 +10,7 @@ import Foundation
 class Row {
     var name: String
     var icon: String
+    var icons = [String]()
     var iconModifier: String?
     var link: String?
     var comment: String?
@@ -22,7 +23,7 @@ class Row {
     
     init(text theText: String, key: String) {
         var text = theText
-        
+                
         if key == "currency" {
             text = text.substring(start: "<td>", end: "</td>") ?? ""
         }
@@ -37,6 +38,11 @@ class Row {
             text = text.substring(before: "-->").trim()
         }
         
+        // handle vanity emoji with country in comment
+        if comment != nil && comment!.count == 1 {
+            icons.append(comment!)
+        }
+        
         if yearPrefix.contains(key) && text.count > 5 {
             prefix = text.substring(before: " ")
             text = text.substring(after: " ")
@@ -46,10 +52,24 @@ class Row {
             prefix = text.substring(start: "airport\">", end: "</span>")
             text = text.substring(after: "</span> ")
         }
-            
-        if text.contains("<span class=\"dark\">") {
-            reference = text.substring(start: "<span class=\"dark\">", end: "</span>")?.trim()
-            text = text.substring(before: "<span class=\"dark\">").trim() // removes everything after span
+
+        if key == "projects" {
+            if text.contains("<span class=\"dark\">") {
+                reference = text.substring(start: "<span class=\"dark\">", end: "</span>")?.trim()
+                text = text.replacingOccurrences(of: "<span class=\"dark\">", with: "")
+                text = text.replacingOccurrences(of: "</span>", with: "")
+            }
+        }
+        
+        let referenceBefore = ["confluence", "grand-unions", "worldsfair"]
+        if text.contains("<span class=\"dark\">") || text.contains("<span class=\"airport\">") {
+            reference = text.substring(start: "<span class=\"dark\">", end: "</span>")?.trim() ??
+                text.substring(start: "<span class=\"airport\">", end: "</span>")?.trim()
+            if referenceBefore.contains(key) {
+                text = text.substring(after: "</span>").trim() // removes everything after span
+            } else {
+                text = text.substring(before: "<span").trim() // removes everything before span
+            }
         }
         
         if key == "mosques" {
@@ -61,13 +81,13 @@ class Row {
             if last.isEmoji() {
                 self.icon = String(last)
                 if text.contains(".png\"> ") {
-                    text = text.substring(after: ".png\"> ")
+                    text = text.substring(after: ".png\"> ").remove(trailing: "</a>")
                 }
                 self.name = text
             } else {
                 self.icon = String(text.first!)
                 if text.contains(".png\"> ") {
-                    text = text.substring(after: ".png\"> ")
+                    text = text.substring(after: ".png\"> ").remove(trailing: "</a>")
                 }
                 self.name = text.substring(from: 1).trim()
             }
@@ -79,11 +99,15 @@ class Row {
                 self.icon = String(text.first!)
             }
             self.name = text.substring(from: 1).trim()
-        } else if text.count > 2 {
-            self.icon = String(text.first!)
-            self.name = text.substring(from: 1).trim()
         } else {
-            self.icon = ""
+            while (text.count > 1 && text.first!.isEmoji()) {
+                let emoji = String(text.first!)
+                if !icons.contains(emoji) {
+                    icons.append(emoji)
+                }
+                text = text.substring(from: 1).trim()
+            }
+            self.icon = icons.first ?? ""
             self.name = text
         }
         
@@ -91,28 +115,36 @@ class Row {
             strike = true
         }
         
-        if key == "worldsfair" && name.contains(", ") {
-            let parts = name.components(separatedBy: ", ")
-            if (parts.count == 2) {
-                name = parts[0]
-                info = ", " + parts[1] // handle this
-            }
-        }
-        
         while name.count > 0 && name.last!.isEmoji() {
             iconModifier = String(name.last!) + (iconModifier ?? "")
             name = String(name.dropLast()).trim()
         }
         
-        if name.hasPrefix("<a href") {
+        if name.contains("<img") && name.contains(".png") {
+            if let _ = name.substring(start: "src=\"", end: "\"") {
+                name = name.substring(after: ".png\">").trim()
+            }
+        }
+
+        if name.contains("<a href") {
             link = name.substring(start: "href=\"", end: "\"")
             if let newName = name.substring(start: "\">", end: "</a>") {
                 let more = name.substring(after: "</a>")
                 name = newName
                 if more.count > 0 {
-                    info = more
+                    info = more.replacingOccurrences(of: ",", with: "").trim()
                 }
+            } else {
+                print("couldn't get text between \"> and </a>")
             }
+        }
+        
+        if name.hasSuffix("*") {
+            name = name.substring(before: "*")
+        }
+        
+        if name.contains("<a href") {
+            print("What?! \(name)")
         }
 
         if name.hasPrefix("<span class=\"strike\">") {

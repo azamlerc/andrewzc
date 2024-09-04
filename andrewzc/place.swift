@@ -12,7 +12,7 @@ var placeFiles = [HTMLFile]()
 
 class Place: Entity {
     var been = false
-    var country: Country?
+    var countries = [Country]()
     
     override init(row: Row) {
         super.init(row: row)
@@ -53,29 +53,13 @@ func loadPlaces(key: String) {
         return group.map { row in
             let place = Place(row: row) // Place.getPlace(row: row)
             
-            var icon = row.icon
-            if row.comment != nil && row.comment!.count == 1 { // handle vanity emoji with country in comment
-                icon = row.comment!
-            }
-            if let country = Country.getCountry(icon: icon) {
-                place.country = country
-                country.add(place: place, key: key)
-            } else {
-                if !["🌎", "🌍", "🌊", "🚗", "<"].contains(row.icon) && icon != "" {
-                    print("Not a country: \(icon) \(row.name)")
+            place.icons.forEach { icon in
+                if let country = Country.getCountry(icon: icon) {
+                    place.countries.append(country)
+                    country.add(place: place, key: key)
                 }
             }
-
-            while (place.name.first?.isEmoji() ?? false) {
-                let otherIcon = String(place.name.first!)
-                place.icons.append(otherIcon)
-                place.name = place.name.substring(from: 1).trim()
-
-                if let otherCountry = Country.getCountry(icon: otherIcon) {
-                    otherCountry.add(place: place, key: key)
-                }
-            }
-
+            
             return place
         }
     }
@@ -90,5 +74,10 @@ func loadPlaces(key: String) {
     }
     let places = placeGroups.flatMap { $0 }
     placesFile.entities = places
+
+    if wikiLocations && wikiLocationPages.contains(key) {
+        loadWikiLocations(placesFile: placesFile, places: places)
+    }
 }
+
 

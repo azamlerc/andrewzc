@@ -19,7 +19,7 @@ class City: Place {
         }
 
         if let someCountry = Country.getCountry(icon: countryIcon) {
-            country = someCountry
+            self.countries.append(someCountry)
             someCountry.cities.append(self)
             someCountry.score += 1
         } else {
@@ -73,7 +73,7 @@ func loadCities(key: String) -> [City] {
         return group.map {
             let city = City(row: $0) // City.getCity(row: $0)
 
-            if let country = city.country {
+            if let country = city.countries.first {
                 country.add(place: city, key: key)
             }
             
@@ -85,16 +85,6 @@ func loadCities(key: String) -> [City] {
                 city.metadata[key + "-prefix"] = prefix
             }
 
-            while (city.name.first?.isEmoji() ?? false) {
-                let otherIcon = String(city.name.first!)
-                city.icons.append(otherIcon)
-                city.name = city.name.substring(from: 1).trim()
-
-                if let otherCountry = Country.getCountry(icon: otherIcon) {
-                    otherCountry.add(place: city, key: key)
-                }
-            }
-            
             return city
         }
     }
@@ -105,5 +95,11 @@ func loadCities(key: String) -> [City] {
             cityGroups[1].forEach { $0.been = true }
         }
     }
-    return cityGroups.flatMap { $0 }
+    let cities = cityGroups.flatMap { $0 }
+    
+    if wikiLocations && wikiLocationPages.contains(key) {
+        loadWikiLocations(placesFile: citiesFile, places: cities)
+    }
+
+    return cities
 }

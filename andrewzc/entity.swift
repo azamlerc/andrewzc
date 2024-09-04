@@ -24,7 +24,7 @@ class Entity: CustomStringConvertible {
     
     init(row: Row) {
         self.icon = row.icon
-        self.icons = [row.icon]
+        self.icons = row.icons
         self.iconModifier = row.iconModifier
         self.name = row.name
         self.key = simplify(row.name)

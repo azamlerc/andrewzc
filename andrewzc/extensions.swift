@@ -57,7 +57,7 @@ extension String {
 
 extension Character {
     func isEmoji() -> Bool {
-        if self == "2️⃣" || self == "7️⃣" {
+        if "0️⃣1️⃣2️⃣3️⃣4️⃣5️⃣6️⃣7️⃣8️⃣9️⃣".contains(self) {
             return true
         }
         if self.isNumber {

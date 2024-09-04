@@ -7,7 +7,7 @@
 
 import Foundation
 
-let folderPath = "/Users/andrew/Documents/Website/"
+let folderPath = "/Users/andrew/Projects/andrewzc.net/"
 
 var pageIndex = [String:HTMLFile]()
 
@@ -23,6 +23,8 @@ class HTMLFile {
     
     var rowGroups = [[Row]]()
     var entities = [Entity]()
+    
+    var data = [String:Any]()
     
     init(entity: Entity, folder: String) {
         self.key = entity.key
@@ -115,6 +117,32 @@ class HTMLFile {
     
     func htmlString() -> String {
         return htmlHeader(title: self.icon + " " + self.name) + contents + htmlFooter()
+    }
+    
+    func dataPath() -> String {
+        return folderPath + "data/" + key + ".json"
+    }
+
+    func loadData() {
+        if let json = loadJSONFromFile(atPath: dataPath()) {
+            self.data = json
+            
+            for (key, value) in self.data {
+                if var dict = value as? [String: Any] {
+                    if let lat = dict["lat"], let long = dict["long"] {
+                        dict["coords"] = "\(lat), \(long)"
+                        dict.removeValue(forKey: "lat")
+                        dict.removeValue(forKey: "long")
+                        self.data[key] = dict
+                    }
+                }
+            }
+        }
+    }
+    
+    func saveData() {
+        writeJSONToFile(dictionary: self.data, atPath: dataPath())
+        writeCSVToFile(dictionary: self.data, atPath: folderPath + "csv/" + key + ".csv")
     }
 }
 
