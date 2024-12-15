@@ -73,6 +73,11 @@ func simplify(_ value: String) -> String {
         .replacingOccurrences(of: " ", with: "-")
         .replacingOccurrences(of: "’", with: "")
         .replacingOccurrences(of: ".", with: "")
+        .replacingOccurrences(of: ",", with: "")
+        .replacingOccurrences(of: "*", with: "")
+        .replacingOccurrences(of: "\"", with: "")
+        .replacingOccurrences(of: "<", with: "")
+        .replacingOccurrences(of: ">", with: "")
         .folding(options: .diacriticInsensitive, locale: .current)
         .replacingOccurrences(of: "the-", with: "")
 }

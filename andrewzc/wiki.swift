@@ -7,17 +7,16 @@
 
 import Foundation
 
-let loadCoords = true
-
 func loadWikiLocations(placesFile: HTMLFile, places: [Place]) {
     placesFile.loadData()
     print("updating \(placesFile.name)")
     places.forEach { place in
         var placeData: [String:Any] = placesFile.data[place.key] as? [String:Any] ?? [String:Any]()
-        if placeData["link"] == nil { placeData["link"] = place.link }
+        if place.link != nil { placeData["link"] = place.link }
         if placeData["name"] == nil { placeData["name"] = place.name }
         if let reference = place.reference { placeData["reference"] = reference }
         if let info = place.info { placeData["info"] = info }
+        if place.strike { placeData["strike"] = true }
         placeData["been"] = place.been
         if place.countries.count == 1 {
             if place.countries[0].code != "" {
@@ -28,21 +27,32 @@ func loadWikiLocations(placesFile: HTMLFile, places: [Place]) {
         } else if place.countries.count > 1 {
             placeData["countries"] = place.countries.map { $0.code }
         }
-        if loadCoords && placeData["coords"] == nil {
-            if place.link?.contains("wikipedia") == true {
-                if !getCoordinatesForWikiPage(link: place.link!, placeData: &placeData) {
-                    let possibleLink = wikipediaLink(for: place.name)
-                    print("Falling back to \(place.name)")
-                    _ = getCoordinatesForWikiPage(link: possibleLink, placeData: &placeData)
-                }
-            } else if place.link?.contains("geohack") == true {
+        if place.states.count == 1 {
+            placeData["state"] = place.states[0]
+        } else if place.states.count > 1 {
+            placeData["states"] = place.states
+        }
+        if placeData["coords"] == nil {
+            if place.link?.contains("geohack") == true {
                 getCoordinatesFromGeohack(link: place.link!, placeData: &placeData)
-            } else {
-                let possibleLink = wikipediaLink(for: place.name)
-                print("Trying \(place.name)")
-                if getCoordinatesForWikiPage(link: possibleLink, placeData: &placeData) {
-                    print("setting link: \(possibleLink)")
-                    placeData["link"] = possibleLink
+            } else if place.link?.contains("confluence") == true {
+                getCoordinatesFromConfluence(link: place.link!, placeData: &placeData)
+            } else if loadCoords {
+                if place.link?.contains("wikipedia") == true {
+                    if !getCoordinatesForWikiPage(link: place.link!, placeData: &placeData) {
+                        let possibleLink = wikipediaLink(for: place.name)
+                        print("Falling back to \(place.name)")
+                        _ = getCoordinatesForWikiPage(link: possibleLink, placeData: &placeData)
+                    }
+                } else {
+                    let possibleLink = wikipediaLink(for: place.name)
+                    print("Trying \(place.name)")
+                    if getCoordinatesForWikiPage(link: possibleLink, placeData: &placeData) {
+                        if placeData["link"] == nil {
+                            print("setting link: \(possibleLink)")
+                            placeData["link"] = possibleLink
+                        }
+                    }
                 }
             }
         }
@@ -162,7 +172,7 @@ func loadWikipediaContent(link: String) -> String? {
             if let source = json["source"] as? String {
                 return source.replacingOccurrences(of: "{{coord|qid=", with: "{{xxxxx|qid=")
             } else {
-                print("couldn't get source: \(apiUrl) \(json["errorKey"] ?? "unknown error")")
+                // print("couldn't get source: \(apiUrl) \(json["errorKey"] ?? "unknown error")")
             }
         } else {
             print("couldn't load json: \(apiUrl)")
@@ -236,6 +246,13 @@ func getCoordinatesFromGeohack(link: String, placeData: inout [String:Any]) {
         print(coords)
         placeData["coords"] = coords
     }
+}
+
+func getCoordinatesFromConfluence(link: String, placeData: inout [String:Any]) {
+    let params = queryStringToDict(query: link.substring(after: "?"))
+    let coords = "\(params["lat"] ?? "0").0, \(params["lon"] ?? "0").0"
+    print(coords)
+    placeData["coords"] = coords
 }
 
 func parseCoordinates(_ coordinates: String, separator: String) -> String? {

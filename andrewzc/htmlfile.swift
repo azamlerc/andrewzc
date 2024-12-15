@@ -25,6 +25,7 @@ class HTMLFile {
     var entities = [Entity]()
     
     var data = [String:Any]()
+    var badData = false
     
     init(entity: Entity, folder: String) {
         self.key = entity.key
@@ -60,7 +61,7 @@ class HTMLFile {
             if key == "mosques" {
                 lines = lines.filter { $0.hasPrefix("<a class=\"english") || $0.hasPrefix("<hr>") || $0.hasPrefix("<!--") }
             } else {
-                lines = lines.filter { !$0.hasPrefix("<img") && !$0.hasPrefix("<a") && !$0.hasPrefix("<div") && !$0.hasPrefix("</div") && !$0.hasSuffix(":") && !($0.hasPrefix("<!--") && $0.hasSuffix("-->")) }
+                lines = lines.filter { !($0.hasPrefix("<img") && !$0.contains("images/states/")) && !$0.hasPrefix("<a") && !$0.hasPrefix("<div") && !$0.hasPrefix("</div") && !$0.hasSuffix(":") && !($0.hasPrefix("<!--") && $0.hasSuffix("-->")) }
                 if lines.count > 0 {
                     lines.removeFirst()
                 }
@@ -137,12 +138,18 @@ class HTMLFile {
                     }
                 }
             }
+        } else {
+            badData = FileManager.default.fileExists(atPath: dataPath())
         }
     }
     
     func saveData() {
-        writeJSONToFile(dictionary: self.data, atPath: dataPath())
-        writeCSVToFile(dictionary: self.data, atPath: folderPath + "csv/" + key + ".csv")
+        if badData {
+            print("Skipping \(self.name)")
+        } else {
+            writeJSONToFile(dictionary: self.data, atPath: dataPath())
+            writeCSVToFile(dictionary: self.data, atPath: folderPath + "csv/" + key + ".csv")
+        }
     }
 }
 

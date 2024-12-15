@@ -40,17 +40,18 @@ func writeJSONToFile(dictionary: [String: Any], atPath path: String) {
 }
 
 func writeCSVToFile(dictionary: [String: Any], atPath path: String) {
-    var output = "\"name\",\"latitude\",\"longitude\",\"been\"\n"
+    var rows = [String]()
     for (_, foo) in dictionary {
         if let dict = foo as? [String:Any], let coords = dict["coords"] as? String {
             let latlong = coords.components(separatedBy: ",").map { $0.trim() }
             let been = dict["been"] != nil && (dict["been"] as! Bool) ? "been" : "todo"
             if latlong.count == 2 {
                 let values = [dict["name"] ?? "", latlong[0], latlong[1], been]
-                output += values.map { "\"\($0)\"" }.joined(separator: ",") + "\n"
+                rows.append(values.map { "\"\($0)\"" }.joined(separator: ","))
             }
         }
     }
+    let output = "\"name\",\"latitude\",\"longitude\",\"been\"\n" + rows.sorted().joined(separator: "\n")
     do {
         try output.write(to: URL(fileURLWithPath: path), atomically: true, encoding: String.Encoding.utf8)
     } catch {

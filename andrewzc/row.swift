@@ -11,6 +11,7 @@ class Row {
     var name: String
     var icon: String
     var icons = [String]()
+    var states = [String]()
     var iconModifier: String?
     var link: String?
     var comment: String?
@@ -66,9 +67,28 @@ class Row {
             reference = text.substring(start: "<span class=\"dark\">", end: "</span>")?.trim() ??
                 text.substring(start: "<span class=\"airport\">", end: "</span>")?.trim()
             if referenceBefore.contains(key) {
+                while (text.count > 1 && text.first!.isEmoji()) {
+                    let emoji = String(text.first!)
+                    if !icons.contains(emoji) {
+                        icons.append(emoji)
+                    }
+                    text = text.substring(from: 1).trim()
+                }
                 text = text.substring(after: "</span>").trim() // removes everything after span
             } else {
                 text = text.substring(before: "<span").trim() // removes everything before span
+            }
+        }
+        
+        if text.hasPrefix("<img") && text.contains("images/states/") {
+            icons.append("🇺🇸")
+            while text.hasPrefix("<img") && text.contains("images/states/") {
+                if let state = text.substring(start: "images/states/", end: ".png\">")?.uppercased() {
+                    self.states.append(state)
+                    text = text.substring(after: "\">").trim()
+                } else {
+                    break
+                }
             }
         }
         
@@ -135,7 +155,7 @@ class Row {
                     info = more.replacingOccurrences(of: ",", with: "").trim()
                 }
             } else {
-                print("couldn't get text between \"> and </a>")
+                print("couldn't get text between \"> and </a>: \(name)")
             }
         }
         
@@ -143,10 +163,6 @@ class Row {
             name = name.substring(before: "*")
         }
         
-        if name.contains("<a href") {
-            print("What?! \(name)")
-        }
-
         if name.hasPrefix("<span class=\"strike\">") {
             if let newName = name.substring(start: "<span class=\"strike\">", end: "</span>") {
                 name = newName

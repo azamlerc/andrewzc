@@ -13,9 +13,11 @@ var placeFiles = [HTMLFile]()
 class Place: Entity {
     var been = false
     var countries = [Country]()
+    var states = [String]()
     
     override init(row: Row) {
         super.init(row: row)
+        self.states = row.states
     }
     
     override init(icon: String, name: String) {
@@ -32,10 +34,10 @@ class Place: Entity {
         if reference != nil && reference != name {
             nameHtml += " <span class=\"dark\">\(reference!)</span>"
         }
-        if nameHtml.contains("state-large") {
-            nameHtml = nameHtml.replacingOccurrences(of: "state-large\" src=\"images", with: "state-small\" src=\"../images", options: .literal, range: nil)
+        if info != nil {
+            nameHtml += " " + info!
         }
-        var line = "\(iconHtml) \(nameHtml)\(info ?? "")<br>\n"
+        var line = "\(iconHtml) \(nameHtml)<br>\n"
         if prefix != nil {
             line = "\(prefix!) \(line)"
         }

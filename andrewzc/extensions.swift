@@ -52,8 +52,7 @@ extension String {
     subscript(offset: Int) -> Character {
        self[index(startIndex, offsetBy: offset)]
     }
-    
-}
+    }
 
 extension Character {
     func isEmoji() -> Bool {
@@ -85,3 +84,18 @@ func split(array: [String], delimiter: String) -> [[String]] {
     return output
 }
 
+func queryStringToDict(query: String) -> [String: String] {
+    var dict = [String: String]()
+
+    let pairs = query.components(separatedBy: "&")
+    for pair in pairs {
+        let elements = pair.components(separatedBy: "=")
+        if elements.count == 2 {
+            let key = elements[0]
+            let value = elements[1]
+            dict[key] = value
+        }
+    }
+
+    return dict
+}
