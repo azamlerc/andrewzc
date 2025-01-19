@@ -40,8 +40,11 @@ class Row {
         }
         
         // handle vanity emoji with country in comment
-        if comment != nil && comment!.count == 1 {
-            icons.append(comment!)
+        if comment != nil {
+            let last = comment!.last!
+            if last.isEmoji() {
+                icons.append(String(last))
+            }
         }
         
         if yearPrefix.contains(key) && text.count > 5 {
@@ -56,15 +59,14 @@ class Row {
 
         if key == "projects" {
             if text.contains("<span class=\"dark\">") {
-                reference = text.substring(start: "<span class=\"dark\">", end: "</span>")?.trim()
+                self.reference = text.substring(start: "<span class=\"dark\">", end: "</span>")?.trim()
                 text = text.replacingOccurrences(of: "<span class=\"dark\">", with: "")
                 text = text.replacingOccurrences(of: "</span>", with: "")
             }
         }
         
-        let referenceBefore = ["confluence", "grand-unions", "worldsfair"]
         if text.contains("<span class=\"dark\">") || text.contains("<span class=\"airport\">") {
-            reference = text.substring(start: "<span class=\"dark\">", end: "</span>")?.trim() ??
+            self.reference = text.substring(start: "<span class=\"dark\">", end: "</span>")?.trim() ??
                 text.substring(start: "<span class=\"airport\">", end: "</span>")?.trim()
             if referenceBefore.contains(key) {
                 while (text.count > 1 && text.first!.isEmoji()) {
@@ -96,21 +98,6 @@ class Row {
             self.icon = text.substring(start: "<span>", end: "</span>") ?? ""
             self.name = text.substring(start: "\">", end: "</a>") ?? ""
             self.link = text.substring(start: "href=\"", end: "\">") ?? ""
-        } else if key == "metros" && comment != nil {
-            let last = comment!.last!
-            if last.isEmoji() {
-                self.icon = String(last)
-                if text.contains(".png\"> ") {
-                    text = text.substring(after: ".png\"> ").remove(trailing: "</a>")
-                }
-                self.name = text
-            } else {
-                self.icon = String(text.first!)
-                if text.contains(".png\"> ") {
-                    text = text.substring(after: ".png\"> ").remove(trailing: "</a>")
-                }
-                self.name = text.substring(from: 1).trim()
-            }
         } else if key == "deaths" && comment != nil {
             let last = comment!.last!
             if last.isEmoji() {
@@ -155,7 +142,7 @@ class Row {
                     info = more.replacingOccurrences(of: ",", with: "").trim()
                 }
             } else {
-                print("couldn't get text between \"> and </a>: \(name)")
+                print("\(key) couldn't get text between \"> and </a>: \(name)")
             }
         }
         

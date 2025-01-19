@@ -24,14 +24,15 @@ class Place: Entity {
         super.init(icon: icon, name: name)
     }
     
-    override func htmlString() -> String {
+    override func htmlString(pageName: String? = nil) -> String {
         var iconHtml = icons.joined(separator: " ")
         if !been {
             iconHtml = "<span class=\"todo\">\(iconHtml)</span>"
         }
         let classHtml = strike ? " class=\"strike\"" : ""
-        var nameHtml = link == nil ? name : "<a href=\"\(link!)\"\(classHtml)>\(name)</a>"
-        if reference != nil && reference != name {
+        let displayName = name == pageName && reference != nil ? reference! : name
+        var nameHtml = link == nil ? displayName : "<a href=\"\(link!)\"\(classHtml)>\(displayName)</a>"
+        if reference != nil && reference != name && reference != pageName && name != pageName {
             nameHtml += " <span class=\"dark\">\(reference!)</span>"
         }
         if info != nil {
@@ -49,6 +50,7 @@ func loadPlaces(key: String) {
     guard !key.hasPrefix("http") else {
         return
     }
+    
     let placesFile = HTMLFile(key: key)
     placeFiles.append(placesFile)
     let placeGroups = placesFile.rowGroups.map { group in
@@ -62,11 +64,24 @@ func loadPlaces(key: String) {
                 }
             }
             
+            if key != "states" {
+                if let city = cityIndex[place.name.removeAccents()] {
+                    city.add(place: place, key: key)
+                } else if let reference = place.reference, let city = cityIndex[reference.removeAccents()] {
+                    city.add(place: place, key: key)
+                }
+            }
+            
             return place
         }
     }
     if placeGroups.count > 0 {
-        placeGroups[0].forEach { $0.been = true }
+        placeGroups[0].forEach {
+            if ($0.name == "Lian") {
+                print("Been to Lian")
+            }
+            $0.been = true
+        }
         
         if placeGroups.count > 1 && middleSectionBeen.contains(key) {
             placeGroups[1].forEach { $0.been = true }

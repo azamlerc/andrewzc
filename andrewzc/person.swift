@@ -35,7 +35,7 @@ class Person: Entity {
         score += 1
     }
     
-    override func htmlString() -> String {
+    override func htmlString(pageName: String? = nil) -> String {
         let iconHtml = icons.joined(separator: " ")
         let classHtml = strike ? " class=\"strike\"" : ""
         var nameHtml = link == nil ? name : "<a href=\"\(link!)\"\(classHtml)>\(name)</a>"
@@ -119,7 +119,7 @@ class Person: Entity {
                 }
                 body.append(personFile.link(flags))
                 someThings.forEach {
-                    body.append($0.htmlString(person: self))
+                    body.append($0.htmlString(pageName: self.name))
                 }
                 body.append("<div class=\"smallSpace\"><br></div>\n")
             }

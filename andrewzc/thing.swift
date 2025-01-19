@@ -10,17 +10,17 @@ import Foundation
 class Thing: Entity {
     var people = [Person]()
     
-    func htmlString(person: Person) -> String {
+    override func htmlString(pageName: String? = nil) -> String {
         let iconHtml = icons.joined(separator: " ")
         let classHtml = strike ? " class=\"strike\"" : ""
         var nameHtml = name
         var iconOrderHack = false
-        if nameHtml.count == 0 && reference == person.name {
-            nameHtml = person.name
+        if nameHtml.count == 0 && reference == pageName {
+            nameHtml = pageName!
             iconOrderHack = true
         }
         nameHtml = link == nil ? nameHtml : "<a href=\"\(link!)\"\(classHtml)>\(nameHtml)</a>"
-        if reference != nil && reference != person.name {
+        if reference != nil && reference != pageName {
             nameHtml += " <span class=\"dark\">\(reference!)</span>"
         }
         if let modifier = iconModifier {

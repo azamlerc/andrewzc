@@ -50,7 +50,7 @@ class Entity: CustomStringConvertible {
         return "\(key).html"
     }
 
-    func htmlString() -> String {
+    func htmlString(pageName: String? = nil) -> String {
         if let theLink = link {
             return "\(icon) <a href=\"\(theLink)\">\(name)</a><br>\n"
         } else {

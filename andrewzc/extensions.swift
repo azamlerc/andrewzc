@@ -52,7 +52,11 @@ extension String {
     subscript(offset: Int) -> Character {
        self[index(startIndex, offsetBy: offset)]
     }
+    
+    func removeAccents() -> String {
+        return self.folding(options: .diacriticInsensitive, locale: .current)
     }
+}
 
 extension Character {
     func isEmoji() -> Bool {
