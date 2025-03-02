@@ -97,6 +97,31 @@ func loadJSONFromURL(url: URL, apiKey: String?) -> [String: Any]? {
     return jsonData
 }
 
+func loadPageFromURL(url: URL) -> String? {
+    var pageData: String?
+    let semaphore = DispatchSemaphore(value: 0)
+    
+    var request = URLRequest(url: url)
+    request.httpMethod = "GET"
+    
+    let urlSession = URLSession(configuration: .ephemeral)
+    let task = urlSession.dataTask(with: request) { data, response, error in
+        defer { semaphore.signal() }
+        
+        guard let data = data, error == nil else {
+            print("Error: \(error?.localizedDescription ?? "Unknown error")")
+            return
+        }
+        
+        pageData = String(decoding: data, as: UTF8.self)
+    }
+    
+    task.resume()
+    semaphore.wait()
+    
+    return pageData
+}
+
 extension Dictionary where Key == String, Value: Any {
     func jsonDataWithSortedKeys() -> Data? {
         func sortAndSerialize(_ dict: [String: Any], indentLevel: Int) -> String {

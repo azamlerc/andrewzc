@@ -11,10 +11,13 @@ let folderPath = "/Users/andrew/Projects/andrewzc.net/"
 
 var pageIndex = [String:HTMLFile]()
 
+var totalPlaceCount = 0
+
 class HTMLFile {
     var key: String
     var filename: String
     var path: String
+    var dataPath: String
     
     var contents = ""
     var lines = [String]()
@@ -24,6 +27,8 @@ class HTMLFile {
     var rowGroups = [[Row]]()
     var entities = [Entity]()
     
+    var iconCounts = [String:Int]()
+    var placeCount = 0
     var data = [String:Any]()
     var badData = false
     
@@ -33,12 +38,14 @@ class HTMLFile {
         self.name = entity.name
         self.icon = entity.icon
         self.path = "\(folderPath)\(folder)/\(filename)"
+        self.dataPath = "\(folderPath)\(folder)/data/\(key).json"
     }
     
     init(key: String) {
         self.key = key
         self.filename = "\(key).html"
         self.path = folderPath + filename
+        self.dataPath = "\(folderPath)data/\(key).json"
         
         read()
     }
@@ -68,7 +75,18 @@ class HTMLFile {
             }
             let lineGroups = split(array: lines, delimiter: "<hr>")
             rowGroups = lineGroups.map { group in
-                group.map { Row(text:$0, key: key) }
+                group.map { text in
+                    let row = Row(text:text, key: key)
+                    countIcons(icons: row.icons)
+                    return row
+                }
+            }
+            for (icon, count) in iconCounts {
+                if let country = countryIndex[icon] {
+                    country.placeCount += count
+                    self.placeCount += count
+                    totalPlaceCount += count
+                }
             }
         }
     }
@@ -120,12 +138,21 @@ class HTMLFile {
         return htmlHeader(title: self.icon + " " + self.name) + contents + htmlFooter()
     }
     
-    func dataPath() -> String {
-        return folderPath + "data/" + key + ".json"
+    func countIcons(icons: [String]) {
+        icons.forEach { icon in
+            iconCounts[icon] = (iconCounts[icon] ?? 0) + 1
+        }
     }
-
+    
+    func iconCounts(for countries:[Country]) -> [Int] {
+        var counts = [Int]()
+        countries.forEach { counts.append(iconCounts[$0.icon] ?? 0) }
+        while counts.last == 0 { counts.removeLast() }
+        return counts
+    }
+    
     func loadData() {
-        if let json = loadJSONFromFile(atPath: dataPath()) {
+        if let json = loadJSONFromFile(atPath: dataPath) {
             self.data = json
             
             for (key, value) in self.data {
@@ -139,7 +166,7 @@ class HTMLFile {
                 }
             }
         } else {
-            badData = FileManager.default.fileExists(atPath: dataPath())
+            badData = FileManager.default.fileExists(atPath: dataPath)
         }
     }
     
@@ -147,8 +174,8 @@ class HTMLFile {
         if badData {
             print("Skipping \(self.name)")
         } else {
-            writeJSONToFile(dictionary: self.data, atPath: dataPath())
-            writeCSVToFile(dictionary: self.data, atPath: folderPath + "csv/" + key + ".csv")
+            writeJSONToFile(dictionary: self.data, atPath: dataPath)
+            // writeCSVToFile(dictionary: self.data, atPath: folderPath + "csv/" + key + ".csv")
         }
     }
 }

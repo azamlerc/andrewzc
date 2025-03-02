@@ -50,11 +50,29 @@ extension String {
     }
     
     subscript(offset: Int) -> Character {
-       self[index(startIndex, offsetBy: offset)]
+        self[index(startIndex, offsetBy: offset)]
     }
     
     func removeAccents() -> String {
         return self.folding(options: .diacriticInsensitive, locale: .current)
+    }
+    
+    func getCoordinates() -> [String] {
+        let pattern = "\\{\\{[Cc]oord\\|([^}]+)\\}\\}"
+        var results: [String] = []
+        
+        if let regex = try? NSRegularExpression(pattern: pattern) {
+            let range = NSRange(self.startIndex..<self.endIndex, in: self)
+            let matches = regex.matches(in: self, options: [], range: range)
+            
+            for match in matches {
+                if let coordinatesRange = Range(match.range(at: 1), in: self) {
+                    results.append(String(self[coordinatesRange]))
+                }
+            }
+        }
+        
+        return results
     }
 }
 
@@ -102,4 +120,81 @@ func queryStringToDict(query: String) -> [String: String] {
     }
 
     return dict
+}
+
+func convertToDecimal(coords: String) throws -> String {
+    let regexPattern = #"""
+    (\d{1,3})°(\d{1,2})′(\d{1,2}(?:\.\d+)?)″([NSWE])|  # DMS with direction
+    (\d{1,3})°(\d{1,2}(?:\.\d+)?)′([NSWE])|           # DM with direction
+    (\d{1,3})°([NSWE])|                               # D with direction
+    ([+-]?\d*\.?\d+)(°?\s?)([NSWE]?)                 # Decimal with optional direction
+    """#
+
+    let regex = try NSRegularExpression(pattern: regexPattern, options: .allowCommentsAndWhitespace)
+    
+    let components = coords.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) }
+    guard components.count == 2 else {
+        throw NSError(domain: "InvalidCoordinate", code: 1, userInfo: [NSLocalizedDescriptionKey: "Invalid coordinate format"])
+    }
+
+    let decimalCoordinates = try components.map { component -> Double in
+        let range = NSRange(location: 0, length: component.utf16.count)
+        guard let match = regex.firstMatch(in: component, options: [], range: range) else {
+            throw NSError(domain: "InvalidCoordinate", code: 2, userInfo: [NSLocalizedDescriptionKey: "Invalid coordinate format"])
+        }
+
+        var decimalDegrees: Double = 0
+        var degrees: Double = 0
+        var minutes: Double = 0
+        var seconds: Double = 0
+        var direction: String?
+
+        if let degreesRange = Range(match.range(at: 1), in: component),
+           let minutesRange = Range(match.range(at: 2), in: component),
+           let secondsRange = Range(match.range(at: 3), in: component),
+           let directionRange = Range(match.range(at: 4), in: component) {
+            // DMS format
+            degrees = Double(component[degreesRange]) ?? 0
+            minutes = Double(component[minutesRange]) ?? 0
+            seconds = Double(component[secondsRange]) ?? 0
+            direction = String(component[directionRange])
+        } else if let degreesRange = Range(match.range(at: 5), in: component),
+                  let minutesRange = Range(match.range(at: 6), in: component),
+                  let directionRange = Range(match.range(at: 7), in: component) {
+            // DM format
+            degrees = Double(component[degreesRange]) ?? 0
+            minutes = Double(component[minutesRange]) ?? 0
+            direction = String(component[directionRange])
+        } else if let degreesRange = Range(match.range(at: 8), in: component),
+                  let directionRange = Range(match.range(at: 9), in: component) {
+            // D format
+            degrees = Double(component[degreesRange]) ?? 0
+            direction = String(component[directionRange])
+        } else if let decimalRange = Range(match.range(at: 10), in: component),
+                  let directionRange = Range(match.range(at: 12), in: component) {
+            // Decimal format with direction
+            decimalDegrees = Double(component[decimalRange]) ?? 0
+            direction = String(component[directionRange])
+            if direction == "S" || direction == "W" {
+                decimalDegrees = -decimalDegrees
+            }
+            return decimalDegrees
+        } else if let decimalRange = Range(match.range(at: 10), in: component) {
+            // Decimal format without direction
+            decimalDegrees = Double(component[decimalRange]) ?? 0
+            return decimalDegrees
+        }
+
+        // Convert to decimal degrees
+        decimalDegrees = degrees + (minutes / 60) + (seconds / 3600)
+
+        // Apply direction
+        if direction == "S" || direction == "W" {
+            decimalDegrees = -decimalDegrees
+        }
+
+        return decimalDegrees
+    }
+    
+    return String(format: "%.8f, %.8f", decimalCoordinates[0], decimalCoordinates[1])
 }

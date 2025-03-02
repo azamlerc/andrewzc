@@ -99,6 +99,7 @@ class Row {
             self.icon = text.substring(start: "<span>", end: "</span>") ?? ""
             self.name = text.substring(start: "\">", end: "</a>") ?? ""
             self.link = text.substring(start: "href=\"", end: "\">") ?? ""
+            icons.append(icon)
         } else if key == "deaths" && comment != nil {
             let last = comment!.last!
             if last.isEmoji() {
