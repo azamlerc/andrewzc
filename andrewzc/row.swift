@@ -41,9 +41,10 @@ class Row {
         
         // handle vanity emoji with country in comment
         if comment != nil {
-            let last = comment!.last!
-            if last.isEmoji() {
-                icons.append(String(last))
+            while comment?.last?.isEmoji() == true {
+                let icon = comment!.removeLast()
+                icons.append(String(icon))
+                comment = comment!.trim()
             }
         }
         
