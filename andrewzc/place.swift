@@ -25,13 +25,18 @@ class Place: Entity {
     }
     
     override func htmlString(pageName: String? = nil) -> String {
-        var iconHtml = icons.joined(separator: " ")
+        var iconsDisplay = icons
+        if pageName == "timezones" && icons.count > 1 {
+            iconsDisplay = [icons.last!]
+        }
+        var iconHtml = iconsDisplay.joined(separator: " ")
         if !been {
             iconHtml = "<span class=\"todo\">\(iconHtml)</span>"
         }
         let classHtml = strike ? " class=\"strike\"" : ""
         let displayName = name == pageName && reference != nil ? reference! : name
-        var nameHtml = link == nil ? displayName : "<a href=\"\(link!)\"\(classHtml)>\(displayName)</a>"
+        let folder = pageName == "countries" ? "../" : ""
+        var nameHtml = link == nil ? displayName : "<a href=\"\(folder)\(link!)\"\(classHtml)>\(displayName)</a>"
         if reference != nil && reference != name && reference != pageName && name != pageName {
             nameHtml += " <span class=\"dark\">\(reference!)</span>"
         }
