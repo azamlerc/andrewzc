@@ -93,12 +93,39 @@ class Country: Place {
     }
     
     func add(place: Place, key: String) {
+        add(place: place, key: key, avoidDuplicates: false)
+    }
+    
+    func add(place: Place, key: String, avoidDuplicates: Bool) {
         var places = placesByKey[key]
         if places == nil {
             places = [Place]()
         }
-        places!.append(place)
-        placesByKey[key] = places!
+        if !avoidDuplicates || places!.contains(where: { $0.name == place.name && $0.reference == place.reference }) == false {
+            places!.append(place)
+            placesByKey[key] = places!
+        }
+    }
+    
+    let excludePlaces = ["Chihuahua", "Pacific Standard Time", "Mountain Standard Time", "Nogales", "Gulf of Mexico", "Guzmán Basin", "Rio Grande", "Colorado", "Guadalajara Line 3", "Mexikoplatz", "Mexikói út", "Frida Kahlo", "Zoe Saldaña", "Woman arrested with 130 poisonous frogs in luggage", "Aeromexico passenger opens plane door and walks on wing"]
+    let allowDuplicates = ["castles", "currency"]
+    
+    func addPlaces(from countries: [String]) {
+        for icon in countries {
+            if let country = countryIndex[icon] {
+                add(place: country, key: "countries")
+                for (key, places) in country.placesByKey {
+                    for place in places {
+                        if place.been {
+                            if !excludePlaces.contains(place.name) {
+                                add(place: place, key: key,
+                                    avoidDuplicates: !allowDuplicates.contains(key))
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     
     func placesSummary() -> [String:Int] {
@@ -111,8 +138,14 @@ class Country: Place {
     
     func countryFile() -> HTMLFile {
         let file = HTMLFile(entity: self, folder: "countries")
-        
         var body = ""
+
+        if let countries = placesByKey["countries"] as? [Country] {
+            countries.forEach {
+                body.append($0.htmlString(pageName: "countries"))
+            }
+        }
+        
         if flag("border-zone") {
             body.append("🛂 Border<br>\n")
         } else if been {
@@ -144,7 +177,7 @@ class Country: Place {
                 }
                 body.append(placeFile.link(flags))
                 somePlaces.forEach {
-                    body.append($0.htmlString())
+                    body.append($0.htmlString(pageName: placeFile.key))
                 }
                 body.append("<div class=\"smallSpace\"><br></div>\n")
             }
@@ -153,6 +186,12 @@ class Country: Place {
         file.contents = body
         return file
     }
+}
+
+func metaCountry(icon: String, name: String, countries: [String]) {
+    let latam = Country(icon: icon, name: name)
+    latam.addPlaces(from: countries)
+    latam.countryFile().write()
 }
 
 func loadCountries(key: String) -> [Country] {

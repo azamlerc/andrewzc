@@ -8,11 +8,11 @@
 import Foundation
 
 let indexPages = ["geography", "buildings", "infrastructure", "music", "nature", "trains", "roadtrips", "people"]
-let countryLists = ["citizenship", "european-union", "eurozone", "lefthand", "left-to-right", "marriage", "microstates", "nato", "no-trains", "schengen", "similar-flags"]
+let countryLists = ["citizenship", "european-union", "eurozone", "lefthand", "left-to-right", "marriage", "microstates", "nato", "no-trains", "non-binary", "schengen", "similar-flags"]
 let cityLists = ["capitals", "twin-cities", "congestion", "culture", "divided", "homes", "money-heist", "newcastle", "olympics", "tintin", "aop", "worldsfair", "eurovision", "planned", "spa-towns"]
 let middleSectionBeen = ["twin-cities", "border-posts", "confluence", "ferries", "metros", "trams", "tripoints", "awa"]
-let yearPrefix = ["olympics", "worldsfair", "automatic", "gauges", "projects", "left-to-right", "highest", "lowest", "europe-2003", "high-speed", "concerts", "eclipses", "people-movers", "eurovision"]
-let topLevelPages = ["bucket", "unesco", "languages", "official-languages", "currency"]
+let yearPrefix = ["olympics", "worldsfair", "automatic", "gauges", "projects", "left-to-right", "highest", "lowest", "europe-2003", "high-speed", "concerts", "eclipses", "people-movers", "eurovision", "timezones", "metro-population", "metro-prices"]
+let topLevelPages = ["bucket", "unesco", "languages", "official-languages", "currency", "tv-places"]
 let morePages = ["tv", "cars", "manuals"]
 let excludedFiles = ["bingo", "train-facts", "subway", "hiroshima", "no-trains", "john-irving", "band-members", "countdown/index", "america-2022", "america-2023", "pacific-northwest", "brioude", "boundary-stones", "new-england", "eastern-shore", "million-dollars", "song-titles", "music-plants", "music-numbers", "music-colors", "music-tech", "rick-astley", "music-food", "music-animals", "transit-terms", "subway-status/index", "vulkaneifel", "florida"]
 let crossLinkedFiles = ["buildings": ["stations"],
@@ -21,8 +21,8 @@ let crossLinkedFiles = ["buildings": ["stations"],
                         "infrastructure": ["trams", "metros"],
                         "trains": ["funiculars", "music-trains", "rail-trails", "useless"],
                         "people": ["artists", "artist-names", "diverse", "guest-singers", "metro-people", "music-people"]]
-let personThingPages = ["deaths", "artist-names", "music-origins", "concerts", "music-animals", "backing-bands", "bi-people", "music-cars", "music-colors", "cover-songs", "diverse", "featuring", "female-bassists", "guest-singers", "music-food", "love-songs", "multi-instrumentalists", "multiple-bands", "music-numbers", "music-people", "music-places", "music-plants", "producers", "trios", "singing-bassists", "singing-drummers", "solo", "songwriters", "music-space", "music-tech", "music-time", "music-trains", "music-water"]
-let referenceBefore = ["confluence", "grand-unions", "worldsfair", "depots", "loops", "tram-roundabouts", "split-platform", "rolling-stock"]
+let personThingPages = ["deaths", "artist-names", "music-origins", "anton-corbijn", "concerts", "music-animals", "backing-bands", "bi-people", "music-cars", "music-colors", "cover-songs", "diverse", "featuring", "female-bassists", "guest-singers", "music-food", "love-songs", "multi-instrumentalists", "multiple-bands", "music-numbers", "music-people", "music-places", "music-plants", "producers", "trios", "singing-bassists", "singing-drummers", "solo", "songwriters", "music-space", "music-tech", "music-time", "music-trains", "music-water"]
+let referenceBefore = ["confluence", "grand-unions", "worldsfair", "depots", "loops", "tram-roundabouts", "split-platform", "rolling-stock", "fare-cards", "renamed", "single-platform", "head-on", "circle-lines"]
 let wikiLocationPages = [
     "confluence",
 //    "spas",
@@ -137,6 +137,8 @@ morePages.forEach { loadPlaces(key: $0) }
 allCountries.sort { $0.name < $1.name }
 allCountries.forEach { $0.countryFile().write() }
 allCities.forEach { $0.cityFile().write() }
+
+metaCountry(icon: "🌎", name: "Latin America", countries: ["🇲🇽", "🇨🇷", "🇨🇴", "🇩🇴"])
 
 var artists = loadPeople(key: "artists")
 personThingPages.forEach { loadPersonThings(key: $0) }
