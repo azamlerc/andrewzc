@@ -17,6 +17,8 @@
 		494F12212AA8BF020002DBFF /* row.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494F12202AA8BF020002DBFF /* row.swift */; };
 		4975E7022A75E92A00F8A682 /* country.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4975E7012A75E92A00F8A682 /* country.swift */; };
 		4975E7042A7607CE00F8A682 /* city.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4975E7032A7607CE00F8A682 /* city.swift */; };
+		49A355562D3F4572003CA328 /* apple.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A355552D3F456E003CA328 /* apple.swift */; };
+		49A355582D432449003CA328 /* location.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49A355572D432436003CA328 /* location.swift */; };
 		49B4264B2BF19CA200469818 /* config.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49B4264A2BF19CA200469818 /* config.swift */; };
 		49B4264D2BF19E0A00469818 /* json.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49B4264C2BF19E0A00469818 /* json.swift */; };
 		49B4264F2BF1A9C000469818 /* wiki.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49B4264E2BF1A9C000469818 /* wiki.swift */; };
@@ -46,6 +48,8 @@
 		494F12202AA8BF020002DBFF /* row.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = row.swift; sourceTree = "<group>"; };
 		4975E7012A75E92A00F8A682 /* country.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = country.swift; sourceTree = "<group>"; };
 		4975E7032A7607CE00F8A682 /* city.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = city.swift; sourceTree = "<group>"; };
+		49A355552D3F456E003CA328 /* apple.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = apple.swift; sourceTree = "<group>"; };
+		49A355572D432436003CA328 /* location.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = location.swift; sourceTree = "<group>"; };
 		49B4264A2BF19CA200469818 /* config.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = config.swift; sourceTree = "<group>"; };
 		49B4264C2BF19E0A00469818 /* json.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = json.swift; sourceTree = "<group>"; };
 		49B4264E2BF1A9C000469818 /* wiki.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = wiki.swift; sourceTree = "<group>"; };
@@ -83,9 +87,10 @@
 			children = (
 				4917A2D82A75DA64008460AF /* main.swift */,
 				4917A2DF2A75DAFF008460AF /* htmlfile.swift */,
-				494F12202AA8BF020002DBFF /* row.swift */,
 				4917A2E32A75E847008460AF /* entity.swift */,
 				4917A2E52A75E895008460AF /* place.swift */,
+				49A355572D432436003CA328 /* location.swift */,
+				494F12202AA8BF020002DBFF /* row.swift */,
 				493DFEF52ADC9AEB001AC0DE /* thing.swift */,
 				493DFEF32ADC72F6001AC0DE /* person.swift */,
 				4975E7012A75E92A00F8A682 /* country.swift */,
@@ -94,6 +99,7 @@
 				49B4264C2BF19E0A00469818 /* json.swift */,
 				49B4264E2BF1A9C000469818 /* wiki.swift */,
 				49B4264A2BF19CA200469818 /* config.swift */,
+				49A355552D3F456E003CA328 /* apple.swift */,
 			);
 			path = andrewzc;
 			sourceTree = "<group>";
@@ -126,7 +132,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1420;
-				LastUpgradeCheck = 1420;
+				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					4917A2D42A75DA63008460AF = {
 						CreatedOnToolsVersion = 14.2;
@@ -168,6 +174,8 @@
 				4917A2E62A75E895008460AF /* place.swift in Sources */,
 				493DFEF62ADC9AEC001AC0DE /* thing.swift in Sources */,
 				4917A2E22A75DC88008460AF /* extensions.swift in Sources */,
+				49A355582D432449003CA328 /* location.swift in Sources */,
+				49A355562D3F4572003CA328 /* apple.swift in Sources */,
 				49B4264D2BF19E0A00469818 /* json.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -208,9 +216,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -268,9 +278,11 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -293,6 +305,7 @@
 			buildSettings = {
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5NSX786795;
 				ENABLE_HARDENED_RUNTIME = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -305,6 +318,7 @@
 			buildSettings = {
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5NSX786795;
 				ENABLE_HARDENED_RUNTIME = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -19,6 +19,7 @@ class Country: Place {
     var orderVisited: Int?
     
     var placesByKey = [String:[Place]]()
+    var placeCount = 0
     
     override init(row: Row) {
         super.init(row: row)
@@ -87,6 +88,7 @@ class Country: Place {
         case "🤬": self.setFlag("angry")
         case "✈️": self.setFlag("airport")
         case "⬅️": self.setFlag("right-to-left")
+        case "2️⃣": self.setFlag("double")
         default: print("Unknown flag: \(icon)")
         }
         

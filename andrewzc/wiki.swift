@@ -7,82 +7,100 @@
 
 import Foundation
 
-func loadWikiLocations(placesFile: HTMLFile, places: [Place]) {
-    placesFile.loadData()
-    print("updating \(placesFile.name)")
-    places.forEach { place in
-        var placeData: [String:Any] = placesFile.data[place.key] as? [String:Any] ?? [String:Any]()
-        if place.link != nil { placeData["link"] = place.link }
-        if placeData["name"] == nil { placeData["name"] = place.name }
-        if let reference = place.reference { placeData["reference"] = reference }
-        if let info = place.info { placeData["info"] = info }
-        if place.strike { placeData["strike"] = true }
-        placeData["been"] = place.been
-        if place.countries.count == 1 {
-            if place.countries[0].code != "" {
-                placeData["country"] = place.countries[0].code
-            } else {
-                print("No code: \(place.countries[0].name)")
-            }
-        } else if place.countries.count > 1 {
-            placeData["countries"] = place.countries.map { $0.code }
-        }
-        if place.states.count == 1 {
-            placeData["state"] = place.states[0]
-        } else if place.states.count > 1 {
-            placeData["states"] = place.states
-        }
-        if placeData["coords"] == nil {
-            if place.link?.contains("geohack") == true {
-                getCoordinatesFromGeohack(link: place.link!, placeData: &placeData)
-            } else if place.link?.contains("confluence") == true {
-                getCoordinatesFromConfluence(link: place.link!, placeData: &placeData)
-            } else if loadCoords {
-                if place.link?.contains("wikipedia") == true {
-                    if !getCoordinatesForWikiPage(link: place.link!, placeData: &placeData) {
-                        let possibleLink = wikipediaLink(for: place.name)
-                        print("Falling back to \(place.name)")
-                        _ = getCoordinatesForWikiPage(link: possibleLink, placeData: &placeData)
-                    }
-                } else {
-                    let possibleLink = wikipediaLink(for: place.name)
-                    print("Trying \(place.name)")
-                    if getCoordinatesForWikiPage(link: possibleLink, placeData: &placeData) {
-                        if placeData["link"] == nil {
-                            print("setting link: \(possibleLink)")
-                            placeData["link"] = possibleLink
-                        }
-                    }
-                }
-            }
-        }
-
-        placesFile.data[place.key] = placeData
-    }
-    placesFile.saveData()
-}
-
 func wikipediaLink(for name: String) -> String {
     return "https://en.wikipedia.org/wiki/" + name
         .replacingOccurrences(of: " ", with: "_")
         .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
 }
 
-func getCoordinatesForWikiPage(link: String, placeData: inout [String:Any]) -> Bool {
-//    if !link.contains("Pontchartrain") {
-//        return false
-//    }
+func getCoordinatesForBookingPage(link: String, placeData: inout [String:Any]) -> Bool {
+    if let html = loadPageFromURL(url: URL(string: link)!) {
+        if let coords = coordsFromBooking(from: html) {
+            print(coords)
+            placeData["coords"] = coords
+            return true
+        } else {
+            print("couldn't get coords: \(link)")
+            return false
+        }
+    } else {
+        print("couldn't load html: \(link)")
+        return false
+    }
+}
 
+func getCoordinatesForAirbnbPage(link: String, placeData: inout [String:Any]) -> Bool {
+    if let html = loadPageFromURL(url: URL(string: link)!) {
+        if let coords = coordsFromAirbnb(from: html) {
+            print(coords)
+            placeData["coords"] = coords
+            return true
+        } else {
+            print("couldn't get coords: \(link)")
+            print("\n\n\n" + html + "\n\n\n")
+            return false
+        }
+    } else {
+        print("couldn't load html: \(link)")
+        return false
+    }
+}
+
+func coordsFromBooking(from html: String) -> String? {
+    // Define a regex pattern to match the `center` parameter in the `hasMap` URL
+    let pattern = #"center=([0-9\.\-]+,[0-9\.\-]+)"#
+    
+    do {
+        // Create a regex object
+        let regex = try NSRegularExpression(pattern: pattern)
+        let nsrange = NSRange(html.startIndex..<html.endIndex, in: html)
+        
+        // Search for the first match
+        if let match = regex.firstMatch(in: html, options: [], range: nsrange) {
+            // Extract the captured group (the `center` value)
+            if let range = Range(match.range(at: 1), in: html) {
+                return String(html[range])
+            }
+        }
+    } catch {
+        print("Error creating regex: \(error.localizedDescription)")
+    }
+    
+    return nil
+}
+
+func coordsFromAirbnb(from input: String) -> String? {
+    let pattern = #""lat":([-+]?[0-9]*\.?[0-9]+),"lng":([-+]?[0-9]*\.?[0-9]+)"#
+    let regex = try? NSRegularExpression(pattern: pattern, options: [])
+    
+    if let match = regex?.firstMatch(in: input, options: [], range: NSRange(input.startIndex..., in: input)) {
+        if let latRange = Range(match.range(at: 1), in: input),
+           let lngRange = Range(match.range(at: 2), in: input) {
+            let latitude = input[latRange]
+            let longitude = input[lngRange]
+            return "\(latitude),\(longitude)"
+        }
+    }
+    return nil
+}
+
+func getCoordinatesForWikiPage(link: String, key: String, placeData: inout [String:Any]) -> Bool {
     if let content = loadWikipediaContent(link: link) {
         // print(content)
 
         if let newName = content.substring(start: "#REDIRECT [[", end: "]]") ?? content.substring(start: "#Redirect [[", end: "]]") {
             print("redirect: \(newName)")
             let redirect = wikipediaLink(for: newName)
-            return getCoordinatesForWikiPage(link: redirect, placeData: &placeData)
+            if redirect != link {
+                return getCoordinatesForWikiPage(link: redirect, key: key, placeData: &placeData)
+            }
         }
         
-        if let coordinates = content.substring(start: "{{Coord|", end: "}}") ?? content.substring(start: "{{coord|", end: "}}") {
+        var allCoordiantes = content.getCoordinates()
+        if key == "rivers" && allCoordiantes.count == 2 {
+            allCoordiantes = [allCoordiantes[1]] // if source/mouth, use the latter
+        }
+        if let coordinates = allCoordiantes.first {
             if let coords = parseCoordinates(coordinates, separator: "|") {
                 print(coords)
                 placeData["coords"] = coords
@@ -120,9 +138,6 @@ func getCoordinatesForWikiPage(link: String, placeData: inout [String:Any]) -> B
                 let value = $0[1].trim()
                 fields[key] = value
             }
-//        if fields.count > 0 {
-//            print("fields: \(fields)")
-//        }
         
         if let lat = fields["latitude"], let long = fields["longitude"] {
             let coordinates = "\(lat)/\(long)"
@@ -159,7 +174,7 @@ func getCoordinatesForWikiPage(link: String, placeData: inout [String:Any]) -> B
             let urlSafe = link.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)!
             if link != urlSafe {
                 print("Trying \(urlSafe)")
-                return getCoordinatesForWikiPage(link: urlSafe, placeData: &placeData)
+                return getCoordinatesForWikiPage(link: urlSafe, key: key, placeData: &placeData)
             }
         }
     }

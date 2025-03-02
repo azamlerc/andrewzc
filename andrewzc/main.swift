@@ -8,139 +8,62 @@
 import Foundation
 
 let indexPages = ["geography", "buildings", "infrastructure", "music", "nature", "trains", "roadtrips", "people"]
-let countryLists = ["citizenship", "european-union", "eurozone", "lefthand", "left-to-right", "marriage", "microstates", "nato", "no-trains", "schengen", "similar-flags"]
-let cityLists = ["capitals", "twin-cities", "congestion", "culture", "divided", "homes", "money-heist", "newcastle", "olympics", "tintin", "aop", "worldsfair", "eurovision", "planned", "spa-towns"]
-let middleSectionBeen = ["twin-cities", "border-posts", "confluence", "ferries", "metros", "trams", "tripoints", "awa"]
-let yearPrefix = ["olympics", "worldsfair", "automatic", "gauges", "projects", "left-to-right", "highest", "lowest", "europe-2003", "high-speed", "concerts", "eclipses", "people-movers", "eurovision"]
-let topLevelPages = ["bucket", "unesco", "languages", "official-languages", "currency"]
+let countryLists = ["citizenship", "european-union", "eurozone", "landlocked", "lefthand", "left-to-right", "marriage", "microstates", "nato", "no-trains", "schengen", "short-coastline", "similar-flags"]
+let cityLists = ["capitals", "twin-cities", "congestion", "culture", "divided", "homes", "money-heist", "newcastle", "olympics", "tintin", "aop", "worldsfair", "eurovision", "planned", "spa-towns", "belfries", "tv-places", "germany", "belgium", "states"]
+let cityFlags = ["capitals", "culture", "tintin"]
+let middleSectionBeen = ["twin-cities", "border-posts", "confluence", "ferries", /*"metros", "trams",*/ "tripoints", "awa", "states"]
+let yearPrefix = ["olympics", "worldsfair", "automatic", "gauges", "projects", "left-to-right", "highest", "lowest", "europe-2003", "high-speed", "concerts", "eclipses", "people-movers", "eurovision", "independence", "founded", "unification", "fare-free", "open-gangways"]
+let topLevelPages = ["bucket", "unesco", "languages", "official-languages", "currency", "founded", "independence", "territories", "unification"]
 let morePages = ["tv", "cars", "manuals"]
-let excludedFiles = ["bingo", "train-facts", "subway", "hiroshima", "no-trains", "john-irving", "band-members", "countdown/index", "america-2022", "america-2023", "pacific-northwest", "brioude", "boundary-stones", "new-england", "eastern-shore", "million-dollars", "song-titles", "music-plants", "music-numbers", "music-colors", "music-tech", "rick-astley", "music-food", "music-animals", "transit-terms", "subway-status/index", "vulkaneifel", "florida"]
+let excludedFiles = ["bingo", "train-facts", "subway", "hiroshima", "no-trains", "john-irving", "band-members", "countdown/index", "america-2022", "america-2023", "pacific-northwest", "brioude", "new-england", "eastern-shore", "million-dollars", "song-titles", "music-plants", "music-numbers", "music-colors", "music-tech", "rick-astley", "music-food", "music-animals", "transit-terms", "subway-status/index", "vulkaneifel", "florida"]
 let crossLinkedFiles = ["buildings": ["stations"],
                         "nature": ["canals"],
                         "geography": ["international-trams", "international-trains"],
                         "infrastructure": ["trams", "metros"],
                         "trains": ["funiculars", "music-trains", "rail-trails", "useless"],
                         "people": ["artists", "artist-names", "diverse", "guest-singers", "metro-people", "music-people"]]
-let personThingPages = ["deaths", "artist-names", "music-origins", "concerts", "music-animals", "backing-bands", "bi-people", "music-cars", "music-colors", "cover-songs", "diverse", "featuring", "female-bassists", "guest-singers", "music-food", "love-songs", "multi-instrumentalists", "multiple-bands", "music-numbers", "music-people", "music-places", "music-plants", "producers", "trios", "singing-bassists", "singing-drummers", "solo", "songwriters", "music-space", "music-tech", "music-time", "music-trains", "music-water"]
-let referenceBefore = ["confluence", "grand-unions", "worldsfair", "depots", "loops", "tram-roundabouts", "split-platform", "rolling-stock"]
-let wikiLocationPages = [
-    "confluence",
-//    "spas",
-//    "pools",
-//    "salients",
-//    "extremities",
-//    "trams",
-//    "music-places",
-//    "olympics",
-//    "grand-unions",
-//    "tram-roundabouts",
-//    "unesco", // check unmatched ones
-//    "europe-2003",
-//    "aop",
-//    "abandoned",
-//    "airports",
-//    "arches",
-//    "automatic",
-//    "beaches",
-//    "bridges",
-//    "cable-cars",
-//    "capitals",
-//    "castles",
-//    "cathedrals",
-//    "cities",
-//    "cross-platform",
-//    "culture",
-//    "curved",
-//    "disputed",
-//    "elevator-stations",
-//    "elevators",
-//    "enclaves",
-//    "endoheric",
-//    "europe-2022",
-//    "europe-2023",
-//    "eurovision",
-//    "ferries",
-//    "flood",
-//    "forts",
-//    "france",
-//    "funiculars",
-//    "greenhouses",
-//    "ground-zero",
-//    "head-on",
-//    "heritage",
-//    "highest",
-//    "housing",
-//    "infill",
-//    "lakes",
-//    "left-right",
-//    "lighthouses",
-//    "lowest",
-//    "malls",
-//    "metro-places",
-//    "metros",
-//    "microstates",
-//    "mines",
-//    "mountains",
-//    "museums",
-//    "national-parks",
-//    "newcastle",
-//    "people-movers",
-//    "ports",
-//    "power-stations",
-//    "pyramids",
-//    "racetracks",
-//    "rack",
-//    "rail-trails",
-//    "reclaimed",
-//    "records",
-//    "reservations",
-//    "roundabouts",
-//    "rubber",
-//    "spaceports",
-//    "spanish",
-//    "stadiums",
-//    "stairs",
-//    "stations",
-//    "statues",
-//    "temples",
-//    "towers",
-//    "transfer",
-//    "transporter",
-//    "tripoints",
-//    "trolleybuses",
-//    "tunnels",
-//    "turntables",
-//    "twin-stations",
-//    "useless",
-//    "walls",
-//    "waterfalls",
-//    "worldsfair"
-//    "loops",
-//    "swimming",
+let personThingPages = ["deaths", "artist-names", "music-origins", "anton-corbijn", "concerts", "music-animals", "backing-bands", "bi-people", "music-cars", "music-colors", "cover-songs", "diverse", "featuring", "female-bassists", "guest-singers", "music-food", "love-songs", "multi-instrumentalists", "multiple-bands", "music-numbers", "music-people", "music-places", "music-plants", "producers", "trios", "singing-bassists", "singing-drummers", "solo", "songwriters", "music-space", "music-tech", "music-time", "music-trains", "music-water", ]
+// get rid of this!
+let referenceBefore = ["confluence", "grand-unions", "worldsfair", "depots", "loops", "tram-roundabouts", "split-platform", "rolling-stock", "circle-lines", "express", "forks", "skip-stop", "shuttles", "one-way", "single-track", "head-on", "single-platform", "short-turn", "international-trams", "wyes", "fare-cards", "offset", "open-gangways", "highway-medians"]
+let dataPages = ["abandoned", "airbnb", "airports", "aop", "apple", "arches", "automatic", "awa", "beaches", "belfries", "belgium", "border-posts", "boundary-stones", "bridges", "brt", "bucket", "cable-cars", "capitals", "casinos", "castles", "cathedrals", "cities", "confluence", "congestion", "cross-platform", "culture", "curved", "disputed", "elevator-stations", "elevators", "enclaves", "endoheric", "europe-2003", "europe-2022", "europe-2023", "eurovision", "express", "extremities", "featuring", "ferries", "flood", "forts", "france", "funiculars", "germany", "grand-unions", "greenhouses", "ground-zero", "head-on", "heritage", "highest", "hotels", "housing", "infill", "lakes", "left-right", "lighthouses", "loops", "lowest", "luna-park", "malls", "metro-places", "metros", "microstates", "mines", "mosques", "mountains", "moving-walkways", "museums", "music-places", "national-parks", "newcastle", "offset", "olympics", "part-time", "people-movers", "planned", "pools", "ports", "power-stations", "premetros", "pyramids", "racetracks", "rack", "rail-trails", "reclaimed", "records", "reservations", "rivers", "roundabouts", "rubber", "salients", "short-platform", "short-turn", "single-platform", "skip-stop", "sloped", "spa-towns", "spaceports", "spanish", "spas", "split-platform", "springs", "stadiums", "stairs", "states", "stations", "statues", "struve", "suspension", "swimming", "temples", "tintin", "toilets", "towers", "tram-interchange", "tram-roundabouts", "trams", "transfer", "transporter", "tri-states", "tripoints", "trolleybuses", "tunnels", "turntables", "tv-places", "twin-stations", "unesco", "useless", "walls", "waterfalls", "worldsfair", "wyes", "circular"]
+let loadCoords: [String] = []
 
-//    "apple", // manual
-//    "border-posts", // add links first
-//    "mosques", // handle formatting
-]
-let wikiLocations = false
-let loadCoords = false
-
+// loadAppleData()
+var allCities = [City]()
 var allCountries = countryEmoji.map { Country.getCountry(icon: $0)! }
 var visitedCountries = loadCountries(key: "countries")
 countryLists.forEach { _ = loadCountries(key: $0) }
 topLevelPages.forEach { loadPlaces(key: $0) }
-let allCities = loadCities(key: "cities")
+allCities = loadCities(key: "cities")
 allCities.forEach { cityIndex[$0.name.removeAccents()] = $0 }
 cityLists.forEach { _ = loadCities(key: $0) }
 indexPages.forEach { parseIndexPage(key: $0) }
 morePages.forEach { loadPlaces(key: $0) }
 allCountries.sort { $0.name < $1.name }
 allCountries.forEach { $0.countryFile().write() }
-allCities.forEach { $0.cityFile().write() }
+// allCities.forEach { print("\($0.name): \($0.coords ?? "--")") }
+allCities.forEach { $0.writeCityFiles() }
 
 var artists = loadPeople(key: "artists")
 personThingPages.forEach { loadPersonThings(key: $0) }
 loadBandMembers()
 var allPeople = personIndex.values.sorted { $1.score > $0.score }
 artists.forEach { $0.artistFile().write() }
+writeFlagsFile()
 
+func writeFlagsFile() {
+    var flagsFile = [String:Any]()
+    flagsFile["totalCount"] = totalPlaceCount
+    var flagsData = [String:[Int]]()
+    let sortedCountries = allCountries.sorted { $0.placeCount > $1.placeCount }
+    let sortedPages = pageIndex.values
+        .sorted { $0.name < $1.name }
+        .sorted { $0.placeCount > $1.placeCount }
+        .filter { $0.placeCount > 1 }
+        .filter { !excludedFiles.contains($0.key) }
+    for (key, page) in pageIndex { flagsData[key] = page.iconCounts(for: sortedCountries) }
+    flagsFile["data"] = flagsData
+    flagsFile["pages"] = sortedPages.map { ["key": $0.key, "icon": $0.icon, "name": $0.name, "count": $0.placeCount] }
+    flagsFile["countries"] = sortedCountries.map { ["icon": $0.icon, "name": $0.name, "count": $0.placeCount] }
+    writeJSONToFile(dictionary: flagsFile, atPath: "\(folderPath)data/flags.json")
+}

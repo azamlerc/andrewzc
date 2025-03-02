@@ -26,7 +26,7 @@ class City: Place {
             someCountry.cities.append(self)
             someCountry.score += 1
         } else {
-            if !["🪨", "🌖", "<"].contains(row.icon) && icon != "" {
+            if !["🪨", "🌖", "👑", "<"].contains(row.icon) && icon != "" {
                 print("Not a country: \(countryIcon) \(row.name)")
             }
         }
@@ -46,6 +46,8 @@ class City: Place {
         case "🗼": self.setFlag("olympics-tower")
         case "🏔": self.setFlag("olympics-slopes")
         case "🏃‍♂️🤸‍♂️🏊‍♀️🏓": self.setFlag("olympics-pingpong")
+        case "🛣": self.setFlag("highway")
+        case "🚂": self.setFlag("heritage")
         case "*": self.setFlag("sorta")
         default: print("Unknown flag: \(icon)")
         }
@@ -60,10 +62,27 @@ class City: Place {
         placesByKey[key] = places!
     }
 
+    func writeCityFiles() {
+        let file = cityFile()
+        file.write()
+        
+        file.loadData()
+        placesByKey.forEach { type, places in
+            places.forEach { place in
+                place.updateData(placesFile: file, type: type)
+            }
+        }
+        file.saveData()
+
+    }
+    
     func cityFile() -> HTMLFile {
         let file = HTMLFile(entity: self, folder: "cities")
-        
         var body = ""
+        if let loc = self.location {
+            body.append("<div id=\"map\" lat=\"\(loc.latitude)\" lon=\"\(loc.longitude)\" zoom=\"11\"></div><script src=\"../map.js\"></script>")
+        }
+        
         if been {
             body.append("✅ Visited<br>\n")
         }
@@ -84,15 +103,17 @@ class City: Place {
 
         let max = 10
         placeFiles.forEach { placeFile in
-            if let places = placesByKey[placeFile.key] {
-                var flags:[String:Any] = ["htmlClass": "link"]
-                flags["extra"] = places.count > max ? " (\(places.count))" : ""
-                let somePlaces = places.count > max ? Array(places[0..<max]) : places
-                body.append(placeFile.link(flags))
-                somePlaces.forEach {
-                    body.append($0.htmlString(pageName: self.name))
+            if !cityFlags.contains(placeFile.key) {
+                if let places = placesByKey[placeFile.key] {
+                    var flags:[String:Any] = ["htmlClass": "link"]
+                    flags["extra"] = places.count > max ? " (\(places.count))" : ""
+                    let somePlaces = places.count > max ? Array(places[0..<max]) : places
+                    body.append(placeFile.link(flags))
+                    somePlaces.forEach {
+                        body.append($0.htmlString(pageName: self.name))
+                    }
+                    body.append("<div class=\"smallSpace\"><br></div>\n")
                 }
-                body.append("<div class=\"smallSpace\"><br></div>\n")
             }
         }
         
@@ -107,6 +128,7 @@ func loadCities(key: String) -> [City] {
         cityFiles.append(citiesFile)
     }
     placeFiles.append(citiesFile)
+    
     let cityGroups = citiesFile.rowGroups.map { group in
         return group.map {
             let city = City(row: $0)
@@ -114,11 +136,10 @@ func loadCities(key: String) -> [City] {
             if let country = city.countries.first {
                 country.add(place: city, key: key)
             }
-            
             let shortName = city.name.substring(before: ",").removeAccents()
             if let parent = cityIndex[shortName] {
                 if key == "twin-cities" || $0.prefix != nil {
-                    parent.add(place: city, key: key)
+                    // parent.add(place: city, key: key)
                 } else {
                     parent.setFlag(key)
                     if $0.strike {
@@ -147,9 +168,46 @@ func loadCities(key: String) -> [City] {
     }
     let cities = cityGroups.flatMap { $0 }
     
-    if wikiLocations && wikiLocationPages.contains(key) {
-        loadWikiLocations(placesFile: citiesFile, places: cities)
+    if dataPages.contains(key) {
+        citiesFile.loadData()
+        cities.forEach {
+            $0.updateData(placesFile: citiesFile, type: nil)
+        }
+        citiesFile.saveData()
     }
 
     return cities
+}
+
+func getCityByLocation(name: String, location: Location) -> City? {
+    var closestCity: City? = nil
+    var smallestDistance: Double? = nil
+
+    for city in allCities {
+        guard let cityLocation = city.location else { continue }
+        var threshold = 0.2
+        if ["los-angeles", "washington", "paris", "chicagoriv"].contains(city.key) {
+            threshold = 0.4
+        }
+        let distance = cityLocation.distance(to: location)
+        if distance < threshold {
+            if smallestDistance == nil || distance < smallestDistance! {
+                smallestDistance = distance
+                closestCity = city
+            }
+        }
+    }
+    if closestCity != nil && smallestDistance != nil {
+        print("\(name) - \(closestCity!.name): \(smallestDistance!)")
+    }
+    return closestCity
+}
+
+func prefixCity(name: String) -> City? {
+    for city in allCities {
+        if name.hasPrefix(city.name) {
+            return city
+        }
+    }
+    return nil
 }
