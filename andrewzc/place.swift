@@ -74,9 +74,13 @@ class Place: Entity {
             }
         }
     }
+    let duplicateKeys = ["twin-stations"]
     
     func updateData(placesFile: HTMLFile, type: String?) {
-        let dataKey = type == nil ? self.key : "\(type!)-\(self.key)"
+        var dataKey = type == nil ? self.key : "\(type!)-\(self.key)"
+        if duplicateKeys.contains(placesFile.key) && self.reference != nil {
+            dataKey += "-\(simplify(self.reference!))"
+        }
         var placeData: [String:Any] = placesFile.data[dataKey] as? [String:Any] ?? [String:Any]()
         if self.link != nil { placeData["link"] = self.link }
         if placeData["name"] == nil { placeData["name"] = self.name }

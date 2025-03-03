@@ -7,7 +7,7 @@
 
 import Foundation
 
-class Entity: CustomStringConvertible {
+class Entity: CustomStringConvertible, Equatable {
     var icon: String
     var icons: [String]
     var iconModifier: String?
@@ -42,6 +42,10 @@ class Entity: CustomStringConvertible {
         self.key = simplify(name)
     }
     
+    static func == (lhs: Entity, rhs: Entity) -> Bool {
+        return lhs.name == rhs.name && lhs.prefix == rhs.prefix && lhs.reference == rhs.reference
+    }
+
     var description: String {
         return "\(icon) \(name)"
     }

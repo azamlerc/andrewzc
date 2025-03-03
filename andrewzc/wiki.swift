@@ -86,8 +86,6 @@ func coordsFromAirbnb(from input: String) -> String? {
 
 func getCoordinatesForWikiPage(link: String, key: String, placeData: inout [String:Any]) -> Bool {
     if let content = loadWikipediaContent(link: link) {
-        // print(content)
-
         if let newName = content.substring(start: "#REDIRECT [[", end: "]]") ?? content.substring(start: "#Redirect [[", end: "]]") {
             print("redirect: \(newName)")
             let redirect = wikipediaLink(for: newName)

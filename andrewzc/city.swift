@@ -80,7 +80,7 @@ class City: Place {
         let file = HTMLFile(entity: self, folder: "cities")
         var body = ""
         if let loc = self.location {
-            body.append("<div id=\"map\" lat=\"\(loc.latitude)\" lon=\"\(loc.longitude)\" zoom=\"11\"></div><script src=\"../map.js\"></script>")
+            body.append("<div id=\"map\" lat=\"\(loc.latitude)\" lon=\"\(loc.longitude)\" zoom=\"11\"></div><script src=\"../map.js\"></script>\n")
         }
         
         if been {
@@ -107,7 +107,10 @@ class City: Place {
                 if let places = placesByKey[placeFile.key] {
                     var flags:[String:Any] = ["htmlClass": "link"]
                     flags["extra"] = places.count > max ? " (\(places.count))" : ""
-                    let somePlaces = places.count > max ? Array(places[0..<max]) : places
+                    var somePlaces = places.count > max ? Array(places[0..<max]) : places
+                    if ["olympics", "eurovision"].contains(placeFile.key) {
+                        somePlaces = somePlaces.removeDuplicates()
+                    }
                     body.append(placeFile.link(flags))
                     somePlaces.forEach {
                         body.append($0.htmlString(pageName: self.name))
@@ -128,7 +131,7 @@ func loadCities(key: String) -> [City] {
         cityFiles.append(citiesFile)
     }
     placeFiles.append(citiesFile)
-    
+        
     let cityGroups = citiesFile.rowGroups.map { group in
         return group.map {
             let city = City(row: $0)
@@ -139,7 +142,7 @@ func loadCities(key: String) -> [City] {
             let shortName = city.name.substring(before: ",").removeAccents()
             if let parent = cityIndex[shortName] {
                 if key == "twin-cities" || $0.prefix != nil {
-                    // parent.add(place: city, key: key)
+                    parent.add(place: city, key: key)
                 } else {
                     parent.setFlag(key)
                     if $0.strike {
